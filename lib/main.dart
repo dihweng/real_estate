@@ -39,7 +39,7 @@ void main() async {
 
   await LocalStoreHelper.getTheme();
 
-  await _setupDioApiClient();
+  // await _setupDioApiClient();
 
   runApp(
     MultiProvider(

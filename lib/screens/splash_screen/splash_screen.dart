@@ -15,10 +15,10 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>  with TickerProviderStateMixin{
-  final ErrorState _errorStateCtrl = locator<ErrorState>();
+  // final ErrorState _errorStateCtrl = locator<ErrorState>();
 
   //Listen to the error stream
-  late StreamSubscription<ErrorStatus> errorStateSub;
+  // late StreamSubscription<ErrorStatus> errorStateSub;
 
   @override
   void initState() {
@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen>  with TickerProviderStateMi
   @override
   void dispose() {
     super.dispose();
-    errorStateSub.cancel();
+    // errorStateSub.cancel();
   }
 
   @override
