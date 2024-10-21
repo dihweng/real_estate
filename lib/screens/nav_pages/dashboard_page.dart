@@ -26,48 +26,25 @@ class DashboardState extends State<Dashboard> {
   List<Widget> pages = [
     const MapSearch(),
     const MessageScreen(),
-    const Favourites(),
     const HomePage(title: 'Real Estate'),
+    const Favourites(),
     const SettingsScreen(),
   ];
 
-  int currentIndex = 0;
+  int currentIndex = 2;
 
   void onTap(int index) {
     setState(() {
       currentIndex = index;
     });
-    // Execute additional actions based on the selected tab
-    // switch (currentIndex) {
-    //   case 0:
-    //     break;
-    //   case 1:
-    //     // getUserVerificationStatus();
-    //     break;
-    //   case 2:
-    //     // getUserVerificationStatus();
-    //     break;
-    //   case 3:
-    //     break;
-    // }
   }
-
-  // Future<void> getUserVerificationStatus() async {
-  //   var verifyModel = Provider.of<VerifyViewModel>(context, listen: false);
-  //   for (var verificationStatus in verifyModel.verificationStatus) {
-  //     if (verificationStatus.code!.contains('password') &&
-  //         verificationStatus.status == false) {
-  //       return _securePaymentHandler.show();
-  //     }
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
 
     return WillPopScope(
       onWillPop: () async {
-        if (currentIndex == 0) {
+        if (currentIndex == 2) {
           // If on the first screen, close the app
           SystemNavigator.pop();
           // Prevent default back button behavior
@@ -105,16 +82,16 @@ class DashboardState extends State<Dashboard> {
                 elevation: 4,
                 items: const [
                   BottomNavigationBarItem(
-                      label: 'Dashboard',
+                      label: '',
                       icon: Padding(
                         padding: EdgeInsets.only(top: 8.0),
                         child: Icon(
-                          Icons.home_filled,
+                          Icons.search,
                           // color: Theme.of(context).dividerColor,
                         ),
                       )),
                   BottomNavigationBarItem(
-                      label: 'Insights',//remoteConfig.getString('navbar_history_label_text'),
+                      label: '',
                       icon: Padding(
                         padding: EdgeInsets.only(top: 8.0),
                         child: Icon(
@@ -123,20 +100,29 @@ class DashboardState extends State<Dashboard> {
                         ),
                       )),
                   BottomNavigationBarItem(
-                      label: 'Content',//remoteConfig.getString('navbar_assets_label_text'),
+                    label: '',
                       icon: Padding(
                         padding: EdgeInsets.only(top: 8.0),
                         child: Icon(
-                          Icons.feed_outlined,
+                          Icons.home_filled,
                           // color: Theme.of(context).dividerColor,
                         ),
                       )),
                   BottomNavigationBarItem(
-                      label: 'More',//remoteConfig.getString('contact_us'),
+                      label: '',
                       icon: Padding(
                         padding: EdgeInsets.only(top: 8.0),
                         child: Icon(
-                          Icons.more_horiz,
+                          Icons.favorite_sharp,
+                          // color: Theme.of(context).dividerColor,
+                        ),
+                      )),
+                  BottomNavigationBarItem(
+                      label: '',
+                      icon: Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Icon(
+                          Icons.person,
                           // color: Theme.of(context).dividerColor,
                         ),
                       )),
@@ -149,6 +135,4 @@ class DashboardState extends State<Dashboard> {
       ),
     );
   }
-
-
 }

@@ -66,7 +66,6 @@ class _SplashScreenState extends State<SplashScreen>  with TickerProviderStateMi
                   Expanded(
                     flex: 8,
                     child: Container(
-                      color: AppColors.primaryColor,
                       child: Center(
                         child: SizedBox(
                             width: 90,
