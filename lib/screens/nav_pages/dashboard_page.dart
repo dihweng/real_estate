@@ -1,13 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:real_estate/screens/home_page/home_page.dart';
 import 'package:real_estate/screens/nav_pages/map_search_screen.dart';
 import 'package:real_estate/screens/nav_pages/message_screen.dart';
 import 'package:real_estate/screens/nav_pages/settings_screen.dart';
-
 import '../../utils/colors.dart';
 import 'favourites.dart';
-
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -16,13 +16,7 @@ class Dashboard extends StatefulWidget {
   DashboardState createState() => DashboardState();
 }
 
-class DashboardState extends State<Dashboard> {
-
-  /// This global key is used to access the state of the navigator
-  ///associated with the WillPopScope.
-  /// It allows you to manipulate the navigation stack.
-  // final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
-
+class DashboardState extends State<Dashboard> with SingleTickerProviderStateMixin {
   List<Widget> pages = [
     const MapSearch(),
     const MessageScreen(),
@@ -33,6 +27,40 @@ class DashboardState extends State<Dashboard> {
 
   int currentIndex = 2;
 
+  late AnimationController _animationController;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the animation controller with a fast duration for the slide-in
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300), // Fast animation
+    );
+
+    // Set the slide animation from Offset(0, 1) (off the screen at bottom) to Offset(0, 0) (fully visible)
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1),  // Start below the screen
+      end: Offset.zero,            // End at normal position
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOut,       // Fast easing curve
+    ));
+
+    // Start the animation with a delay
+    Future.delayed(const Duration(milliseconds: 2500), () {
+      _animationController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();  // Clean up the controller when done
+    super.dispose();
+  }
+
   void onTap(int index) {
     setState(() {
       currentIndex = index;
@@ -41,14 +69,12 @@ class DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-
     return WillPopScope(
       onWillPop: () async {
         if (currentIndex == 2) {
-          // If on the first screen, close the app
+          // Close the app if on the home screen
           SystemNavigator.pop();
-          // Prevent default back button behavior
-          return false; 
+          return false;
         } else {
           setState(() {
             currentIndex = (currentIndex - 1).clamp(0, pages.length - 1);
@@ -59,80 +85,102 @@ class DashboardState extends State<Dashboard> {
       child: SafeArea(
         top: true,
         bottom: true,
-        child: Stack(
-          children: [
-            Scaffold(
-              body: IndexedStack(
-                index: currentIndex,
-                children: pages,
-              ),
-              bottomNavigationBar: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Theme.of(context).primaryColor,
-                selectedFontSize: 14.0,
-                unselectedFontSize: 14.0,
-                onTap: onTap,
-                currentIndex: currentIndex,
-                selectedItemColor: AppColors.primaryColor,
-                unselectedItemColor: AppColors.captionColor.withOpacity(0.5),
-                selectedLabelStyle:
-                    const TextStyle(fontWeight: FontWeight.w300),
-                showUnselectedLabels: true,
-                showSelectedLabels: true,
-                elevation: 4,
-                items: const [
-                  BottomNavigationBarItem(
-                      label: '',
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Icon(
-                          Icons.search,
-                          // color: Theme.of(context).dividerColor,
-                        ),
-                      )),
-                  BottomNavigationBarItem(
-                      label: '',
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Icon(
-                          Icons.bar_chart,
-                          // color: Theme.of(context).dividerColor,
-                        ),
-                      )),
-                  BottomNavigationBarItem(
-                    label: '',
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Icon(
-                          Icons.home_filled,
-                          // color: Theme.of(context).dividerColor,
-                        ),
-                      )),
-                  BottomNavigationBarItem(
-                      label: '',
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Icon(
-                          Icons.favorite_sharp,
-                          // color: Theme.of(context).dividerColor,
-                        ),
-                      )),
-                  BottomNavigationBarItem(
-                      label: '',
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Icon(
-                          Icons.person,
-                          // color: Theme.of(context).dividerColor,
-                        ),
-                      )),
-                ],
-              ),
-            ),
+        child: Scaffold(
+          body: Stack(
+            children: [
+              // MapSearch is used as the background layer, can be any map or content widget
+              pages[currentIndex],
 
-          ],
+              // Floating CustomBottomNavigationBar
+              Positioned(
+                bottom: 0,
+                left: 20,
+                right: 20,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: CustomBottomNavigationBar(
+                    currentIndex: currentIndex,
+                    onTap: onTap,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+
+class CustomBottomNavigationBar extends StatelessWidget {
+  final int currentIndex;
+  final Function(int) onTap;
+
+  const CustomBottomNavigationBar({
+    Key? key,
+    required this.currentIndex,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
+      decoration: BoxDecoration(
+        color: AppColors.bodyTextColorLightTheme.withOpacity(0.9), // Semi-transparent
+        borderRadius: BorderRadius.circular(50.0), // Rounded corners
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5), // Creates the floating effect
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildNavItem(Icons.search, 0),
+          _buildNavItem(Icons.message, 1),
+          _buildNavItem(Icons.home_filled, 2), // Main button logic now dynamic
+          _buildNavItem(Icons.favorite, 3),
+          _buildNavItem(Icons.person, 4),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(IconData icon, int index) {
+    bool isMain = currentIndex == index;
+
+    return GestureDetector(
+      onTap: () => onTap(index),
+      child: Container(
+        padding: EdgeInsets.all(isMain ? 15.0 : 10.0),
+        decoration: isMain
+            ? BoxDecoration(
+          color: AppColors.primaryColor,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryColor.withOpacity(0.4),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        )
+            : null,
+        child: Icon(
+          icon,
+          size: isMain ? 30.0 : 24.0,
+          color: isMain
+              ? AppColors.logoBackgroundColor
+              : AppColors.logoBackgroundColor.withOpacity(0.6),
+        ),
+      ),
+    );
+  }
+}
+

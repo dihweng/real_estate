@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/back_custom_app_bar.dart';
-import 'dart:math'; // For random height generation
+import 'dart:math';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title});

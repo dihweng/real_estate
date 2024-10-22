@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:real_estate/utils/helper_widgets.dart';
 import 'package:real_estate/widgets/animated_container_width.dart';
-import '../utils/colors.dart';
-import 'app_text.dart';
-import 'expand_zero_max_container.dart';
+import 'size_transition_container.dart';
 
 class BackCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String screenTitle;
@@ -24,16 +21,30 @@ class BackCustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         builder: (context, constraints) {
       final maxWidth = constraints.maxWidth;
         return AppBar(
+          toolbarHeight: 70.0,
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           automaticallyImplyLeading: false,
           elevation: 0,
           title: SizedBox(
-            height: 80,
+            // height: 80,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AnimatedContainerWidth(maxWidth: maxWidth * 0.4),
-                ExpandZeroMaxContainer(),
+                AnimatedContainerWidth(
+                    maxWidth: maxWidth * 0.5, location: 'Lagos Ekeja',),
+                 SizeTransitionContainer(
+                  maxSize: 50,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.transparent,
+                      image: DecorationImage(
+                        image: AssetImage('assets/images/user.png'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

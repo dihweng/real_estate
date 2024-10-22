@@ -1,9 +1,14 @@
 # This is a generated file; do not edit or check into version control.
+flutter_plugin_android_lifecycle=/Users/dih/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.22/
 geolocator=/Users/dih/.pub-cache/hosted/pub.dev/geolocator-11.1.0/
 geolocator_android=/Users/dih/.pub-cache/hosted/pub.dev/geolocator_android-4.6.1/
 geolocator_apple=/Users/dih/.pub-cache/hosted/pub.dev/geolocator_apple-2.3.7/
 geolocator_web=/Users/dih/.pub-cache/hosted/pub.dev/geolocator_web-3.0.0/
 geolocator_windows=/Users/dih/.pub-cache/hosted/pub.dev/geolocator_windows-0.2.3/
+google_maps_flutter=/Users/dih/.pub-cache/hosted/pub.dev/google_maps_flutter-2.9.0/
+google_maps_flutter_android=/Users/dih/.pub-cache/hosted/pub.dev/google_maps_flutter_android-2.14.7/
+google_maps_flutter_ios=/Users/dih/.pub-cache/hosted/pub.dev/google_maps_flutter_ios-2.13.1/
+google_maps_flutter_web=/Users/dih/.pub-cache/hosted/pub.dev/google_maps_flutter_web-0.5.10/
 path_provider=/Users/dih/.pub-cache/hosted/pub.dev/path_provider-2.1.4/
 path_provider_android=/Users/dih/.pub-cache/hosted/pub.dev/path_provider_android-2.2.10/
 path_provider_foundation=/Users/dih/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.0/

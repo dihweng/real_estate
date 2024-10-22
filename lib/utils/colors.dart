@@ -12,7 +12,7 @@ class AppColors {
   static const Color textColor2 = Color.fromRGBO(255, 255, 255, 1);
   static const Color cardColor = Color.fromRGBO(255, 255, 255, 1);
   static const Color gloGreen = Color.fromRGBO(90, 185, 74, 1);
-  static const Color primaryColor = Color.fromRGBO(140, 163, 43, 1);
+  static const Color primaryColor = Color.fromRGBO(249, 140, 18, 1);
   static const Color primaryColor2 = Color.fromRGBO(95, 122, 32, 1);
   static const Color surveyCardColor = Color.fromRGBO(65, 87, 23, 1);
   static const Color favouriteCard = Color.fromRGBO(197, 217, 111, 1);
