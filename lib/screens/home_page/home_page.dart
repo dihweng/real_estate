@@ -309,8 +309,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   // Method to build individual grid items with flexible heights
   Widget _buildGridItem(Map<String, dynamic> item, double itemHeight) {
     return Container(
-      width: (MediaQuery.of(context).size.width / 2) - 12,
-      height: itemHeight,
+      width: (MediaQuery.of(context).size.width / 2) - 12,  // Half the width of screen for two-column layout
+      height: itemHeight,  // Custom item height
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -322,50 +322,48 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ],
       ),
-      child:Stack(
+      child: Stack(
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-              bottomLeft: Radius.circular(12),
-              bottomRight: Radius.circular(12),
-            ),
+            borderRadius: BorderRadius.circular(12),  // Consistent border radius
             child: Image.asset(
               item['imagePath'],
-              width: double.infinity,
-              height: itemHeight,
-              fit: BoxFit.cover,
+              width: double.infinity,  // Make sure the image covers the entire width
+              height: itemHeight,  // Make sure the image height matches the container height
+              fit: BoxFit.cover,  // This ensures the image covers the entire container while maintaining aspect ratio
             ),
           ),
+          // Positioned overlay for label and button
           Positioned(
             bottom: 10,
-            left: 0,
-            right: 0,
+            left: 10,
+            right: 10,  // Provide left and right padding for the overlay
             child: ExpandLocationWidget(
-              maxWidth: MediaQuery.of(context).size.width * 0.2,
+              maxWidth: (MediaQuery.of(context).size.width / 2) - 32,  // Slightly smaller than grid item width
               location: item['label'],
               backgroundColor: const Color.fromRGBO(255, 181, 17, 0.45),
               controller: _controller,
               child: Container(
                 width: 30.0,
-              height: 30.0,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15)
+                height: 30.0,
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 12,
                   ),
-                  child: const Center(
-                      child: Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 12,),
-                  ),
-              ),  // Pass the controller or trigger method
+                ),
+              ),
             ),
           ),
         ],
-      )
+      ),
     );
   }
+
 }
 

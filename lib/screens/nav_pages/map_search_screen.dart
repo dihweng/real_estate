@@ -212,7 +212,7 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                       maxWidth: MediaQuery.of(context).size.width * 0.72,
                       maxHeight: 50,
                       child: Container(
-                        height: 46,
+                        height: 30,
                         clipBehavior: Clip.hardEdge,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
