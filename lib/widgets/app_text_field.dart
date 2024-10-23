@@ -202,13 +202,13 @@ class _AppTextFieldState extends State<AppTextField> {
                       height: 0.7),
                   errorBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                        color: _isError ? AppColors.primaryColor :
+                        color: _isError ? Colors.transparent :
                         AppColors.errorColor2, width: 0.7),
                     borderRadius: BorderRadius.circular(txInputBr),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(
-                        color: AppColors.primaryColor, width: 0.7),
+                        color: Colors.transparent, width: 0.7),
                     borderRadius: BorderRadius.circular(txInputBr),
                   ),
                   enabledBorder: OutlineInputBorder(
@@ -218,13 +218,13 @@ class _AppTextFieldState extends State<AppTextField> {
                   ),
                   disabledBorder: OutlineInputBorder(
                     borderSide: const BorderSide(
-                        color: Colors.blue, width: 0.0),
+                        color: Colors.white, width: 0.0),
                     borderRadius: BorderRadius.circular(txInputBr),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(txInputBr),
                     borderSide: const BorderSide(
-                        color: Colors.green, width: 1.0),
+                        color: Colors.white, width: 1.0),
                   ),
                   filled: true,
                   hintText: widget.hintText,

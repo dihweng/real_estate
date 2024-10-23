@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:real_estate/utils/helper_widgets.dart';
 import '../../locator.dart';
 import '../../services/error_state.dart';
 import '../../utils/colors.dart';
 import '../../utils/local_store.dart';
+import '../../widgets/animated_center_expansion.dart';
 import '../../widgets/app_text_field.dart';
+import '../../widgets/size_transition_container.dart';
 
 class MapSearch extends StatefulWidget {
   const MapSearch({super.key});
@@ -18,29 +21,70 @@ class MapSearch extends StatefulWidget {
 
 class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
   TextEditingController searchController = TextEditingController();
-
-  String name = 'Please enter your name here';
-  String? email = '';
-  String? phoneNumber = '';
   final _formkey = GlobalKey<FormState>();
   final ErrorState _errorStateCtrl = locator<ErrorState>();
 
-  // Google Maps related variables
-  Completer<GoogleMapController> _controller = Completer();
+  // Map-related variables
+  LatLng _initialPosition = LatLng(59.9311, 30.3609); // St. Petersburg Coordinates
   Position? _currentPosition;
-  static const CameraPosition _initialCameraPosition = CameraPosition(
-    target: LatLng(59.9311, 30.3609), // St. Petersburg Coordinates
-    zoom: 12,
-  );
+  bool _isCardVisible = false; // Controls the visibility of the sliding card
+  late AnimationController _animationController;
+  late Animation<Offset> _slideAnimation;
 
-  // Listen to the error stream
-  late StreamSubscription<ErrorStatus> errorStateSub;
-  late Stream<Map<String, dynamic>> userDetails = const Stream.empty();
+  // List of bookmarked locations
+  List<LatLng> _bookmarkedLocations = [
+    LatLng(59.9311, 30.3609), // St. Petersburg
+    LatLng(40.7128, -74.0060), // New York City
+    LatLng(48.8566, 2.3522),   // Paris
+    LatLng(34.0522, -118.2437) // Los Angeles
+  ];
+
+  // List of markers (for bookmarks)
+  List<Marker> _markers = [];
 
   @override
   void initState() {
     super.initState();
     _checkPermissionAndGetLocation();
+    _generateMarkers(); // Generate markers for the bookmarked locations
+
+    // Initialize the animation controller and slide animation
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, 1),  // Start off-screen (below FAB)
+      end: Offset(0, 0),    // Slide into place (aligned with FAB)
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  // Function to generate markers from the bookmarked locations
+  void _generateMarkers() {
+    _markers = _bookmarkedLocations.map((location) {
+      return Marker(
+        width: 80.0,
+        height: 80.0,
+        point: location,
+        child: IconButton(
+          icon: Icon(Icons.bookmark, color: Colors.red),
+          onPressed: () {
+            // Optionally center the map on this location
+            _centerMapOnBookmark(location);
+          },
+        ),
+      );
+    }).toList();
+  }
+
+  // Function to center map on a bookmark
+  Future<void> _centerMapOnBookmark(LatLng bookmark) async {
+    final mapController = MapController(); // Use a controller to interact with the map
+    mapController.move(bookmark, 14.0);    // Move to bookmark with a zoom level of 14
   }
 
   // Function to check location permissions and request if not granted
@@ -83,18 +127,58 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
           desiredAccuracy: LocationAccuracy.high);
       setState(() {
         _currentPosition = position;
+        _initialPosition = LatLng(position.latitude, position.longitude);
       });
-
-      final GoogleMapController controller = await _controller.future;
-      controller.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 14,
-        ),
-      ));
     } catch (e) {
       print("Error getting location: $e");
     }
+  }
+
+  // Method to build the filter card
+  Widget _buildFilterCard() {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      elevation: 5,
+      child: Container(
+        padding: EdgeInsets.all(16),
+        width: double.infinity,
+        height: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title of the card
+            Text(
+              'Select Filter',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 16),
+
+            // List of items (like the one in the image)
+            _buildFilterItem('Cosy areas', Icons.home),
+            _buildFilterItem('Price', Icons.attach_money),
+            _buildFilterItem('Infrastructure', Icons.location_city),
+            _buildFilterItem('Without any layer', Icons.layers_clear),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Helper method to build filter items
+  Widget _buildFilterItem(String label, IconData icon) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.orange),
+      title: Text(label),
+      onTap: () {
+        setState(() {
+          _isCardVisible = false; // Hide the card after selection
+          _animationController.reverse(); // Slide the card back down
+        });
+        // Perform any action on selection
+      },
+    );
   }
 
   @override
@@ -103,16 +187,24 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
       top: true,
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
-
         body: Stack(
           children: [
-            // Google Maps widget
-            GoogleMap(
-              initialCameraPosition: _initialCameraPosition,
-              myLocationEnabled: true,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
+            // Map with bookmark markers
+            FlutterMap(
+              options: MapOptions(
+                  initialCenter: _initialPosition,
+                  initialZoom: 12.0,
+                  crs: const Epsg3857() // Common CRS for OpenStreetMap tiles
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: ['a', 'b', 'c'],
+                ),
+                MarkerLayer(
+                  markers: _markers, // Add the list of bookmark markers here
+                ),
+              ],
             ),
 
             // Search bar at the top
@@ -124,40 +216,58 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                 children: [
                   // Search input
                   Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: AppTextField(
-                          textInputType: TextInputType.emailAddress,
+                    child: AnimatedContainerExpand(
+                      maxWidth: MediaQuery.of(context).size.width * 0.72,
+                      maxHeight: 58,
+                      child: Container(
+                        height: 46,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: AppTextField(
+                          textInputType: TextInputType.streetAddress,
                           labelText: "",
                           textController: searchController,
                           autoFocus: false,
-                          // onFocus: userEmailFocusNode,
                           isPassword: false,
-                          hintText: 'Email',
-                          onEditingComplete: () {
-                          },
-                          textInputAction: TextInputAction.done),
+                          hintText: 'Search',
+                          textInputAction: TextInputAction.done,
+                        ),
+                      ),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  addHorizontalSpace(10),
                   // Filter button
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: IconButton(
-                      onPressed: () {
-                        // Handle filter button click
-                      },
-                      icon: Icon(Icons.filter_alt_outlined, color: Colors.grey),
+                  SizeTransitionContainer(
+                    maxSize: 58,
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(40),
+                      ),
+                      child:  Icon(Icons.link, color: Colors.grey),
                     ),
                   ),
                 ],
+              ),
+            ),
+
+            // Sliding card with filter options
+            AnimatedSlide(
+              offset: _slideAnimation.value,
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              child: Visibility(
+                visible: _isCardVisible,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: _buildFilterCard(),
+                ),
               ),
             ),
 
@@ -174,7 +284,15 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                     children: [
                       FloatingActionButton(
                         onPressed: () {
-                          // Handle action for button 1
+                          setState(() {
+                            _isCardVisible = !_isCardVisible;
+
+                            if (_isCardVisible) {
+                              _animationController.forward(); // Show the card
+                            } else {
+                              _animationController.reverse(); // Hide the card
+                            }
+                          });
                         },
                         backgroundColor: Colors.black.withOpacity(0.2), // Set background color to transparent
                         elevation: 0, // Remove elevation shadow
@@ -189,7 +307,6 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                         elevation: 0, // Remove elevation shadow
                         child: Icon(Icons.location_pin, color: Colors.red),
                       ),
-
                     ],
                   ),
                   FloatingActionButton(
@@ -203,23 +320,6 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            // Floating Bottom Navigation Bar
-            // Positioned(
-            //   bottom: 20,
-            //   left: 0,
-            //   right: 0,
-            //   child: BottomNavigationBar(
-            //     items: const <BottomNavigationBarItem>[
-            //       BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            //       BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Favorites'),
-            //       BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-            //     ],
-            //     currentIndex: 0, // Update this index based on the selected tab
-            //     onTap: (index) {
-            //       // Handle tab changes here
-            //     },
-            //   ),
-            // ),
           ],
         ),
       ),

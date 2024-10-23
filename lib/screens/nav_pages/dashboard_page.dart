@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:real_estate/screens/home_page/home_page.dart';
 import 'package:real_estate/screens/nav_pages/map_search_screen.dart';
 import 'package:real_estate/screens/nav_pages/message_screen.dart';

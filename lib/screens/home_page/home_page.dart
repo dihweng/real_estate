@@ -44,20 +44,14 @@ class _HomePageState extends State<HomePage> {
     {'imagePath': 'assets/images/8.png', 'label': 'Settings Top'},
   ];
 
+  // Method to generate random heights for staggered layout
+  double _getRandomHeight() {
+    final random = Random();
+    return 150.0 + random.nextInt(150); // Random height between 150 and 300
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Split the grid data into odd and even indexed lists
-    List<Map<String, dynamic>> oddItems = [];
-    List<Map<String, dynamic>> evenItems = [];
-
-    for (int i = 0; i < gridData.length; i++) {
-      if (i % 2 == 0) {
-        evenItems.add(gridData[i]);
-      } else {
-        oddItems.add(gridData[i]);
-      }
-    }
-
     return Scaffold(
       appBar: BackCustomAppBar(
         screenTitle: screenTitle,
@@ -65,92 +59,72 @@ class _HomePageState extends State<HomePage> {
           Navigator.of(context).pop();
         },
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.white, // Start color of the gradient (white)
-              Color(0xFFA5967E), // End color of the gradient (#a5967e)
-            ],
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 24.0, right: 24.0, bottom: 0),
-          child: ListView.builder(
-            itemCount: gridData.length,
-            itemBuilder: (BuildContext context, int index) {
-              // Check if the current item should expand to the full width
-              bool isFullWidth = index % 4 == 0; // Every 4th item expands full width
-              double itemHeight = random.nextInt(100) + 150; // Dynamic height
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Hi Mary and Welcome to Real Estate Texts
+            SizedBox(height: 20),
+            Text(
+              'Hi Mary',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Welcome to Real Estate',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            SizedBox(height: 20),
 
-              if (isFullWidth) {
-                // For full-width items, return a single container that spans the entire width
-                return _buildFullWidthItem(gridData[index], itemHeight);
-              } else {
-                // For half-width items, return a row with two staggered ListViews
-                return Row(
-                  children: [
-                    // Odd items
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: (index % 2 == 0)
-                            ? _buildHalfWidthItem(gridData[index], itemHeight)
-                            : const SizedBox.shrink(),
-                      ),
-                    ),
-                    // Even items
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: (index % 2 != 0)
-                            ? _buildHalfWidthItem(gridData[index], itemHeight)
-                            : const SizedBox.shrink(),
-                      ),
-                    ),
-                  ],
+            // Animated counter
+            TweenAnimationBuilder<int>(
+              tween: IntTween(begin: 0, end: 2000), // Count from 0 to 2000
+              duration: Duration(seconds: 2), // Animation duration of 2 seconds
+              builder: (context, value, child) {
+                return Text(
+                  'Number: $value', // Display current value
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 );
-              }
-            },
-          ),
+              },
+            ),
+
+            SizedBox(height: 20),
+
+            // Fixed height scrollable container for grid items
+            Container(
+              height: 400, // Set fixed height for the grid view
+              child: ListView(
+                children: [
+                  Wrap(
+                    spacing: 8.0, // Space between items horizontally
+                    runSpacing: 16.0, // Space between items vertically
+                    children: List.generate(gridData.length, (index) {
+                      // Generate random height for each item
+                      double itemHeight = _getRandomHeight();
+
+                      // For staggered view, alternate large and small items
+                      return _buildGridItem(gridData[index], itemHeight);
+                    }),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  // Method to build full-width item
-  Widget _buildFullWidthItem(Map<String, dynamic> item, double itemHeight) {
+  // Method to build individual grid items with flexible heights
+  Widget _buildGridItem(Map<String, dynamic> item, double itemHeight) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
-      width: double.infinity, // Span full width
+      width: (MediaQuery.of(context).size.width / 2) - 20, // Half of screen width minus padding
       height: itemHeight,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 3,
-            blurRadius: 5,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.asset(
-          item['imagePath'],
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-
-  // Method to build half-width item
-  Widget _buildHalfWidthItem(Map<String, dynamic> item, double itemHeight) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -165,24 +139,25 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.only(
+            borderRadius: BorderRadius.only(
               topLeft: Radius.circular(12),
               topRight: Radius.circular(12),
             ),
             child: Image.asset(
               item['imagePath'],
               width: double.infinity,
-              height: itemHeight,
+              height: itemHeight - 40, // Subtract some height for the label space
               fit: BoxFit.cover,
             ),
           ),
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: Text(
-          //     item['label'],
-          //     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          //   ),
-          // ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              item['label'],
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ],
       ),
     );
