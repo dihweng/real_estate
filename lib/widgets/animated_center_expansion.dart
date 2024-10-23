@@ -5,11 +5,15 @@ class AnimatedContainerExpand extends StatefulWidget {
   final double maxWidth;
   final double maxHeight;
   final Widget child;
+  final Color? bgColor;
+  final BoxDecoration? decoration;
 
   AnimatedContainerExpand({
     required this.maxWidth,
     required this.maxHeight,
     required this.child,
+    this.decoration,
+    this.bgColor,
   });
 
   @override
@@ -60,7 +64,6 @@ class _AnimatedContainerExpandState extends State<AnimatedContainerExpand> with 
       ),
     );
 
-    // Start the animation
     _controller.forward();
   }
 
@@ -81,7 +84,7 @@ class _AnimatedContainerExpandState extends State<AnimatedContainerExpand> with 
             height: _heightAnimation.value, // Animate height
             padding: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
-              color: Colors.white,  // Background color
+              color: widget.bgColor,  // Background color
               borderRadius: BorderRadius.circular(8),  // Add border radius
               boxShadow: [
                 BoxShadow(

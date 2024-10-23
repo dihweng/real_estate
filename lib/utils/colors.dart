@@ -26,8 +26,6 @@ class AppColors {
   static const Color errorColor3 = Color.fromRGBO(243, 193, 188, 1);
   static const Color redTint = Color.fromRGBO(250, 217, 207, 1);
   static const Color successTint = Color.fromRGBO(175, 222, 199, 1);
-  static const Color successTextTint = Color.fromRGBO(12, 92, 53, 1);
-  static const Color goTVGreen = Color.fromRGBO(31, 90, 63, 1);
   static const Color textButtonColor = Color.fromRGBO(236, 242, 207, 1);
   static const Color electricCard = Color.fromRGBO(236, 242, 207, 1);
   static const Color textColorSecondary = Color.fromRGBO(125, 117, 108, 1);

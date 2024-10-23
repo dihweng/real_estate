@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:real_estate/utils/colors.dart';
+import 'package:real_estate/utils/helper_widgets.dart';
+import 'package:real_estate/widgets/animated_slide_text.dart';
+import 'package:real_estate/widgets/animated_text.dart';
+import '../../widgets/animated_center_expansion.dart';
+import '../../widgets/animated_container_no_opacity.dart';
+import '../../widgets/app_text.dart';
 import '../../widgets/back_custom_app_bar.dart';
 import 'dart:math';
+
+import '../../widgets/size_transition_container.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title});
@@ -64,36 +73,107 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hi Mary and Welcome to Real Estate Texts
-            SizedBox(height: 20),
-            Text(
-              'Hi Mary',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            addVerticalSpace(10),
+            const AnimatedText(
+              text:'Hi Mary',
+              size: 28,
+              fontWeight: FontWeight.w600,
             ),
-            SizedBox(height: 8),
-            Text(
-              'Welcome to Real Estate',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-            ),
-            SizedBox(height: 20),
+            addVerticalSpace(8),
 
-            // Animated counter
-            TweenAnimationBuilder<int>(
-              tween: IntTween(begin: 0, end: 2000), // Count from 0 to 2000
-              duration: Duration(seconds: 2), // Animation duration of 2 seconds
-              builder: (context, value, child) {
-                return Text(
-                  'Number: $value', // Display current value
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+            const AnimatedSlideText(
+              text:'Lets select your perfect place',
+              size: 28,
+              fontWeight: FontWeight.w600,
+            ),
+            addVerticalSpace(20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: AnimatedContainerNoOpacity(
+                    maxWidth: MediaQuery.of(context).size.width * 0.4,
+                    maxHeight: MediaQuery.of(context).size.width * 0.4,
+                    bgColor: AppColors.primaryColor,
+                    isCircle: true,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(300), // Circular radius
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 3,
+                          blurRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const AnimatedText(
+                          text: 'BUY',
+                          size: 14,
+                          color: AppColors.textColor2,
+                        ),
+                        TweenAnimationBuilder<int>(
+                          tween: IntTween(begin: 0, end: 1023), // Count from 0 to 2000
+                          duration: const Duration(seconds: 2),
+                          builder: (context, value, child) {
+                            return AppText(
+                              text: '$value',
+                              size: 30,
+                              color: AppColors.textColor2,
+                            );
+                          },
+                        ),
+                        const AnimatedText(
+                          text: 'offers',
+                          size: 14,
+                          color: AppColors.textColor2,
+                        ),
+                      ],
+                    ),
                   ),
-                );
-              },
+                ),
+                Expanded(
+                  child: AnimatedContainerExpand(
+                    maxWidth: MediaQuery.of(context).size.width * 0.4,
+                    maxHeight: MediaQuery.of(context).size.width * 0.4,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const AppText(
+                          text: 'RENT ',
+                          size: 14,
+                          color: AppColors.captionColor,
+                        ),
+                        TweenAnimationBuilder<int>(
+                          tween: IntTween(begin: 0, end: 2000), // Count from 0 to 2000
+                          duration: const Duration(seconds: 2),
+                          builder: (context, value, child) {
+                            return AppText(
+                              text:'$value',
+                              size: 30,
+                              color: AppColors.captionColor,
+                            );
+                          },
+                        ),
+                        const AppText(
+                          text: 'offers',
+                          size: 14,
+                          color: AppColors.captionColor,
+                        ),
+                      ],
+                    ),
+
+                  ),
+                ),
+              ],
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Fixed height scrollable container for grid items
             Container(
@@ -139,7 +219,7 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.only(
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(12),
               topRight: Radius.circular(12),
             ),
@@ -154,7 +234,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(8.0),
             child: Text(
               item['label'],
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
           ),

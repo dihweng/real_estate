@@ -24,7 +24,7 @@ class AnimatedText extends StatefulWidget {
     this.maxLines,
     this.lineHeight,
     this.color,
-    this.duration = const Duration(seconds: 1), // Default fade duration
+    this.duration = const Duration(milliseconds: 4000), // Default fade duration
   }) : super(key: key);
 
   @override
