@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:real_estate/screens/home_page/home_page.dart';
 import 'package:real_estate/screens/nav_pages/map_search_screen.dart';
 import 'package:real_estate/screens/nav_pages/message_screen.dart';
@@ -37,16 +36,18 @@ class DashboardState extends State<Dashboard> with SingleTickerProviderStateMixi
     // Initialize the animation controller with a fast duration for the slide-in
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300), // Fast animation
+      // Fast animation
+      duration: const Duration(milliseconds: 300),
     );
 
     // Set the slide animation from Offset(0, 1) (off the screen at bottom) to Offset(0, 0) (fully visible)
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),  // Start below the screen
-      end: Offset.zero,            // End at normal position
+      // Start below the screen
+      begin: const Offset(0, 1),
+      end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeOut,       // Fast easing curve
+      curve: Curves.easeOut,
     ));
 
     // Start the animation with a delay
@@ -57,7 +58,7 @@ class DashboardState extends State<Dashboard> with SingleTickerProviderStateMixi
 
   @override
   void dispose() {
-    _animationController.dispose();  // Clean up the controller when done
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -129,13 +130,13 @@ class CustomBottomNavigationBar extends StatelessWidget {
       margin: const EdgeInsets.all(20.0),
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 4.0),
       decoration: BoxDecoration(
-        color: AppColors.bodyTextColorLightTheme.withOpacity(0.9), // Semi-transparent
-        borderRadius: BorderRadius.circular(50.0), // Rounded corners
+        color: AppColors.bodyTextColorLightTheme.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(50.0),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
             blurRadius: 10,
-            offset: const Offset(0, 5), // Creates the floating effect
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -144,7 +145,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         children: [
           _buildNavItem(Icons.search, 0),
           _buildNavItem(Icons.message, 1),
-          _buildNavItem(Icons.home_filled, 2), // Main button logic now dynamic
+          _buildNavItem(Icons.home_filled, 2),
           _buildNavItem(Icons.favorite, 3),
           _buildNavItem(Icons.person, 4),
         ],
@@ -183,4 +184,3 @@ class CustomBottomNavigationBar extends StatelessWidget {
     );
   }
 }
-
