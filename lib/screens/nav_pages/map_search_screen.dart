@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:real_estate/utils/helper_widgets.dart';
+import 'package:real_estate/widgets/app_text.dart';
 import '../../locator.dart';
 import '../../services/error_state.dart';
 import '../../utils/colors.dart';
@@ -24,12 +25,14 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
   final _formkey = GlobalKey<FormState>();
   final ErrorState _errorStateCtrl = locator<ErrorState>();
 
-  // Map-related variables
   LatLng _initialPosition = LatLng(59.9311, 30.3609); // St. Petersburg Coordinates
   Position? _currentPosition;
-  bool _isCardVisible = false; // Controls the visibility of the sliding card
+  bool _isCardVisible = false;
   late AnimationController _animationController;
   late Animation<Offset> _slideAnimation;
+
+  // Added a MapController to allow map interaction
+  final MapController _mapController = MapController();
 
   // List of bookmarked locations
   List<LatLng> _bookmarkedLocations = [
@@ -46,24 +49,23 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _checkPermissionAndGetLocation();
-    _generateMarkers(); // Generate markers for the bookmarked locations
+    _generateMarkers();
 
-    // Initialize the animation controller and slide animation
+    // Initialize the animation controller
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, 1),  // Start off-screen (below FAB)
-      end: Offset(0, 0),    // Slide into place (aligned with FAB)
+      begin: Offset(0, 1), // Off-screen
+      end: Offset(-40, 0),
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
   }
 
-  // Function to generate markers from the bookmarked locations
   void _generateMarkers() {
     _markers = _bookmarkedLocations.map((location) {
       return Marker(
@@ -73,7 +75,6 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
         child: IconButton(
           icon: Icon(Icons.bookmark, color: Colors.red),
           onPressed: () {
-            // Optionally center the map on this location
             _centerMapOnBookmark(location);
           },
         ),
@@ -81,31 +82,25 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
     }).toList();
   }
 
-  // Function to center map on a bookmark
   Future<void> _centerMapOnBookmark(LatLng bookmark) async {
-    final mapController = MapController(); // Use a controller to interact with the map
-    mapController.move(bookmark, 14.0);    // Move to bookmark with a zoom level of 14
+    _mapController.move(bookmark, 14.0); // Move to bookmark location
   }
 
-  // Function to check location permissions and request if not granted
   Future<void> _checkPermissionAndGetLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Location services are disabled. Please enable them in settings.'),
+        content: Text('Location services are disabled.'),
       ));
       return;
     }
 
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Location permission is denied. Please allow access to use this feature.'),
+          content: Text('Location permission denied.'),
         ));
         return;
       }
@@ -113,7 +108,7 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
 
     if (permission == LocationPermission.deniedForever) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Location permissions are permanently denied. Please enable them from settings.'),
+        content: Text('Location permissions are permanently denied.'),
       ));
       return;
     }
@@ -128,13 +123,13 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
       setState(() {
         _currentPosition = position;
         _initialPosition = LatLng(position.latitude, position.longitude);
+        _mapController.move(_initialPosition, 14.0); // Center map on current location
       });
     } catch (e) {
       print("Error getting location: $e");
     }
   }
 
-  // Method to build the filter card
   Widget _buildFilterCard() {
     return Card(
       shape: RoundedRectangleBorder(
@@ -143,19 +138,11 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
       elevation: 5,
       child: Container(
         padding: EdgeInsets.all(16),
-        width: double.infinity,
+        width: 200,
         height: 200,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Title of the card
-            Text(
-              'Select Filter',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-
-            // List of items (like the one in the image)
             _buildFilterItem('Cosy areas', Icons.home),
             _buildFilterItem('Price', Icons.attach_money),
             _buildFilterItem('Infrastructure', Icons.location_city),
@@ -166,31 +153,37 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
     );
   }
 
-  // Helper method to build filter items
   Widget _buildFilterItem(String label, IconData icon) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.orange),
-      title: Text(label),
+    return InkWell(
       onTap: () {
         setState(() {
-          _isCardVisible = false; // Hide the card after selection
-          _animationController.reverse(); // Slide the card back down
+          _isCardVisible = false;
+          _animationController.reverse();
         });
-        // Perform any action on selection
       },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.orange),
+            addHorizontalSpace(8),
+            AppText(text: label, size: 14),
+          ],
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      top: true,
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         body: Stack(
           children: [
-            // Map with bookmark markers
+            // Flutter map with controller and markers
             FlutterMap(
+              mapController: _mapController, // Added MapController
               options: MapOptions(
                   initialCenter: _initialPosition,
                   initialZoom: 12.0,
@@ -202,27 +195,26 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                   subdomains: ['a', 'b', 'c'],
                 ),
                 MarkerLayer(
-                  markers: _markers, // Add the list of bookmark markers here
+                  markers: _markers,
                 ),
               ],
             ),
 
-            // Search bar at the top
+            // Search bar and filter button
             Positioned(
               top: 20,
               left: 20,
               right: 20,
               child: Row(
                 children: [
-                  // Search input
                   Expanded(
                     child: AnimatedContainerExpand(
                       maxWidth: MediaQuery.of(context).size.width * 0.72,
-                      maxHeight: 58,
+                      maxHeight: 50,
                       child: Container(
                         height: 46,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                         clipBehavior: Clip.hardEdge,
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(50),
@@ -240,7 +232,6 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                     ),
                   ),
                   addHorizontalSpace(10),
-                  // Filter button
                   SizeTransitionContainer(
                     maxSize: 58,
                     child: Container(
@@ -250,14 +241,14 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(40),
                       ),
-                      child:  Icon(Icons.link, color: Colors.grey),
+                      child: Icon(Icons.link, color: Colors.grey),
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Sliding card with filter options
+            // Sliding filter card
             AnimatedSlide(
               offset: _slideAnimation.value,
               duration: Duration(milliseconds: 500),
@@ -271,7 +262,7 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
               ),
             ),
 
-            // Three action buttons at the bottom, above BottomNavigationBar
+            // Floating action buttons
             Positioned(
               bottom: 100,
               left: 20,
@@ -286,36 +277,34 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                         onPressed: () {
                           setState(() {
                             _isCardVisible = !_isCardVisible;
-
-                            if (_isCardVisible) {
-                              _animationController.forward(); // Show the card
-                            } else {
-                              _animationController.reverse(); // Hide the card
-                            }
+                            _isCardVisible
+                                ? _animationController.forward()
+                                : _animationController.reverse();
                           });
                         },
-                        backgroundColor: Colors.black.withOpacity(0.2), // Set background color to transparent
-                        elevation: 0, // Remove elevation shadow
+                        backgroundColor: Colors.black.withOpacity(0.2),
+                        elevation: 0,
                         child: Icon(Icons.list, color: Colors.black),
                       ),
                       addVerticalSpace(4),
                       FloatingActionButton(
                         onPressed: () {
-                          // Handle action for button 2
+                          _getCurrentLocation(); // Center on current location
                         },
-                        backgroundColor: Colors.black.withOpacity(0.2), // Set background color to transparent
-                        elevation: 0, // Remove elevation shadow
+                        backgroundColor: Colors.black.withOpacity(0.2),
+                        elevation: 0,
                         child: Icon(Icons.location_pin, color: Colors.red),
                       ),
                     ],
                   ),
                   FloatingActionButton(
+                    backgroundColor: Colors.white,
                     onPressed: () {
-                      // Handle action for button 3
+                      setState(() {
+                        _mapController.move(_initialPosition, 10);
+                      });
                     },
-                    backgroundColor: Colors.black.withOpacity(0.2), // Set background color to transparent
-                    elevation: 0, // Remove elevation shadow
-                    child: Icon(Icons.directions, color: Colors.blue),
+                    child: Icon(Icons.gps_fixed, color: Colors.orange),
                   ),
                 ],
               ),
@@ -324,5 +313,11 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 }

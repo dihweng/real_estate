@@ -196,7 +196,7 @@ class _AppTextFieldState extends State<AppTextField> {
                   iconColor: Colors.black.withOpacity(0.6),
                   floatingLabelBehavior: FloatingLabelBehavior.auto,
                   contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16, horizontal: 16),
+                      vertical: 0, horizontal: 16),
                   errorStyle: const TextStyle(
                       color: AppColors.primaryColor,
                       height: 0.7),

@@ -58,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen>  with TickerProviderStateMi
       child: Stack(
         children: [
           Scaffold(
-            backgroundColor: AppColors.primaryColor,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             body: Semantics(
               label: 'Splash screen',
               child: Column(
@@ -66,12 +66,13 @@ class _SplashScreenState extends State<SplashScreen>  with TickerProviderStateMi
                   Expanded(
                     flex: 8,
                     child: Container(
-                      child: Center(
+                      child: const Center(
                         child: SizedBox(
                             width: 90,
                             height: 167,
-                            child:
-                            Image.asset("assets/images/logo.png")),
+                            child: Icon(Icons.h_plus_mobiledata, size: 70,
+                              color: AppColors.primaryColor,)
+                        ),
                       ),
                     ),
                   ),

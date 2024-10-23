@@ -9,6 +9,8 @@ import '../../widgets/app_text.dart';
 import '../../widgets/back_custom_app_bar.dart';
 import 'dart:math';
 
+import '../../widgets/expand_location_widget.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title});
@@ -19,11 +21,14 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   // int _counter = 0;
   String screenTitle = 'Ekeja';
   Random random = Random();
   bool showGrid = false;
+
+  // Controller for ExpandLocationWidget to track timing.
+  late AnimationController _controller;
 
   // void _incrementCounter() {
   //   setState(() {
@@ -32,25 +37,25 @@ class _HomePageState extends State<HomePage> {
   // }
 
   List<Map<String, dynamic>> gridData = [
-    {'imagePath': 'assets/images/1.png', 'label': 'Mirchi 90\'s Radio - F'},
-    {'imagePath': 'assets/images/monday.png', 'label': 'Punjabi Mirchi'},
-    {'imagePath': 'assets/images/3.png', 'label': 'Meethi Mirchi Radio - M'},
-    {'imagePath': 'assets/images/5.png', 'label': 'Mirchi Campus'},
-    {'imagePath': 'assets/images/6.png', 'label': 'Club Mirchi Radio - P'},
-    {'imagePath': 'assets/images/7.png', 'label': 'Mirchi Indies Radio'},
-    {'imagePath': 'assets/images/8.png', 'label': 'Mirchi Top 20 Radio'},
+    {'imagePath': 'assets/images/1.png', 'label': 'Mirchi'},
+    {'imagePath': 'assets/images/monday.png', 'label': 'Mirchi'},
+    {'imagePath': 'assets/images/3.png', 'label': 'MeethiM'},
+    {'imagePath': 'assets/images/5.png', 'label': 'Campus'},
+    {'imagePath': 'assets/images/6.png', 'label': 'Club'},
+    {'imagePath': 'assets/images/7.png', 'label': 'Indies'},
+    {'imagePath': 'assets/images/8.png', 'label': 'Abuja'},
     {'imagePath': 'assets/images/9.png', 'label': 'Podcast'},
-    {'imagePath': 'assets/images/10.png', 'label': 'Mirchi Love'},
-    {'imagePath': 'assets/images/11.png', 'label': 'Filmy Mirchi Radio - '},
-    {'imagePath': 'assets/images/12.png', 'label': 'Volume Campus'},
-    {'imagePath': 'assets/images/1.png', 'label': 'Home Party'},
-    {'imagePath': 'assets/images/2.png', 'label': 'Podcast Love'},
-    {'imagePath': 'assets/images/3.png', 'label': 'Settings Building'},
-    {'imagePath': 'assets/images/4.png', 'label': 'Music Radio'},
-    {'imagePath': 'assets/images/5.png', 'label': 'Volume Radio'},
-    {'imagePath': 'assets/images/6.png', 'label': 'Home Radio'},
-    {'imagePath': 'assets/images/7.png', 'label': 'Radio Podcast'},
-    {'imagePath': 'assets/images/8.png', 'label': 'Settings Top'},
+    {'imagePath': 'assets/images/10.png', 'label': 'Mirchi'},
+    {'imagePath': 'assets/images/11.png', 'label': 'Lome'},
+    {'imagePath': 'assets/images/12.png', 'label': 'Jabi'},
+    {'imagePath': 'assets/images/1.png', 'label': 'Ekeja'},
+    {'imagePath': 'assets/images/2.png', 'label': 'Limpopo'},
+    {'imagePath': 'assets/images/3.png', 'label': 'Togo'},
+    {'imagePath': 'assets/images/4.png', 'label': 'Mangu'},
+    {'imagePath': 'assets/images/5.png', 'label': 'Fan'},
+    {'imagePath': 'assets/images/6.png', 'label': 'Ogun'},
+    {'imagePath': 'assets/images/7.png', 'label': 'Benue'},
+    {'imagePath': 'assets/images/8.png', 'label': 'Testing'},
   ];
 
   // Method to generate random heights for staggered layout
@@ -58,6 +63,24 @@ class _HomePageState extends State<HomePage> {
     final random = Random();
     return 150.0 + random.nextInt(150);
   }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+  }
+
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +112,7 @@ class _HomePageState extends State<HomePage> {
                   addVerticalSpace(10),
                   const AnimatedText(
                     text: 'Hi, Mary',
-                    size: 28,
+                    size: 20,
                     fontWeight: FontWeight.w600,
                     color: AppColors.captionColor,
                   ),
@@ -234,6 +257,49 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              bottom: showGrid ? 0 : -500,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.64,
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.only(top: 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.05),
+                      spreadRadius: 2,
+                      blurRadius: 1,
+                      offset: const Offset(0, 0),
+                    ),
+                  ],
+                ),
+                child: ListView(
+                  children: [
+                    Center(
+                      child: Wrap(
+                        spacing: 8.0,
+                        runSpacing: 6.0,
+                        children: List.generate(gridData.length, (index) {
+                          double itemHeight = _getRandomHeight();
+                          return _buildGridItem(gridData[index], itemHeight);
+                        }),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              onEnd: () {
+                // Callback to trigger ExpandLocationWidget animation
+                _controller.forward();
+              },
+            )
+
           ],
         ),
       ),
@@ -276,19 +342,25 @@ class _HomePageState extends State<HomePage> {
             bottom: 10,
             left: 0,
             right: 0,
-            child: Container(
-              width: double.infinity,
-              color: Colors.black.withOpacity(0.5),
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                item['label'],
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
+            child: ExpandLocationWidget(
+              maxWidth: MediaQuery.of(context).size.width * 0.2,
+              location: item['label'],
+              backgroundColor: const Color.fromRGBO(255, 181, 17, 0.45),
+              controller: _controller,
+              child: Container(
+                width: 30.0,
+              height: 30.0,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15)
+                  ),
+                  child: const Center(
+                      child: Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 12,),
+                  ),
+              ),  // Pass the controller or trigger method
             ),
           ),
         ],
@@ -296,3 +368,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
