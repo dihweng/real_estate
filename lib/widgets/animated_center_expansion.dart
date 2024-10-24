@@ -8,7 +8,7 @@ class AnimatedContainerExpand extends StatefulWidget {
   final Widget child;
   final Color? bgColor;
   final BoxDecoration? decoration;
-  final VoidCallback? onAnimationComplete; // Add this callback
+  final VoidCallback? onAnimationComplete;
 
   AnimatedContainerExpand({
     required this.maxWidth,
@@ -16,7 +16,7 @@ class AnimatedContainerExpand extends StatefulWidget {
     required this.child,
     this.decoration,
     this.bgColor,
-    this.onAnimationComplete, // Add this callback to constructor
+    this.onAnimationComplete,
   });
 
   @override

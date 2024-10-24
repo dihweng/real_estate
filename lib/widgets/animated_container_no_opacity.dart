@@ -6,7 +6,7 @@ class AnimatedContainerNoOpacity extends StatefulWidget {
   final Widget child;
   final Color? bgColor;
   final BoxDecoration? decoration;
-  final bool isCircle; // Prop to make circular shape
+  final bool isCircle;
 
   AnimatedContainerNoOpacity({
     required this.maxWidth,
@@ -14,7 +14,7 @@ class AnimatedContainerNoOpacity extends StatefulWidget {
     required this.child,
     this.decoration,
     this.bgColor,
-    this.isCircle = false, // Default value for non-circular shape
+    this.isCircle = false,
   });
 
   @override
@@ -68,7 +68,7 @@ class _AnimatedContainerNoOpacityState extends State<AnimatedContainerNoOpacity>
           child: ClipRRect(
             borderRadius: widget.isCircle
                 ? BorderRadius.zero
-                : BorderRadius.circular(8), // Rounded corners for non-circular containers
+                : BorderRadius.circular(8),
             child: Container(
               width: _widthAnimation.value,
               height: _heightAnimation.value,
@@ -76,7 +76,7 @@ class _AnimatedContainerNoOpacityState extends State<AnimatedContainerNoOpacity>
               decoration: widget.isCircle
                   ? BoxDecoration(
                 color: widget.bgColor,
-                shape: BoxShape.circle, // Circular shape
+                shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.05),
@@ -88,7 +88,7 @@ class _AnimatedContainerNoOpacityState extends State<AnimatedContainerNoOpacity>
               )
                   : BoxDecoration(
                 color: widget.bgColor,
-                borderRadius: BorderRadius.circular(8), // Regular radius
+                borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.05),
@@ -100,7 +100,6 @@ class _AnimatedContainerNoOpacityState extends State<AnimatedContainerNoOpacity>
               ),
               child: Center(
                 child: SingleChildScrollView(
-                  // Add SingleChildScrollView to prevent overflow
                   child: widget.child,
                 ),
               ),

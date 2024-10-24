@@ -11,7 +11,7 @@ class AnimatedText extends StatefulWidget {
   final TextOverflow? overflow;
   final int? maxLines;
   final double? lineHeight;
-  final Duration duration; // Animation duration
+  final Duration duration;
 
   const AnimatedText({
     Key? key,
@@ -24,7 +24,7 @@ class AnimatedText extends StatefulWidget {
     this.maxLines,
     this.lineHeight,
     this.color,
-    this.duration = const Duration(milliseconds: 4000), // Default fade duration
+    this.duration = const Duration(milliseconds: 4000),
   }) : super(key: key);
 
   @override

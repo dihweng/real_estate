@@ -145,12 +145,6 @@ class _AppTextFieldState extends State<AppTextField> {
                 controller: widget.textController,
                 textCapitalization: widget.capitalization!,
                 validator: widget.validate,
-                // validator: (value) {
-                //   if (_isSubmitted) {
-                //     return widget.validate != null ? widget.validate!(value) : null;
-                //   }
-                //   return null;  // Disable validation until submission
-                // },
                 onSaved: widget.onSaved,
                 onChanged: (value) {
                   if (widget.onChanged != null) {

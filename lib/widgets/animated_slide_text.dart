@@ -11,7 +11,7 @@ class AnimatedSlideText extends StatefulWidget {
   final TextOverflow? overflow;
   final int? maxLines;
   final double? lineHeight;
-  final Duration duration; // Animation duration
+  final Duration duration;
 
   const AnimatedSlideText({
     Key? key,
@@ -24,7 +24,7 @@ class AnimatedSlideText extends StatefulWidget {
     this.maxLines,
     this.lineHeight,
     this.color,
-    this.duration = const Duration(milliseconds: 3000), // Slide duration set to 3000 ms
+    this.duration = const Duration(milliseconds: 3000),
   }) : super(key: key);
 
   @override
@@ -55,8 +55,8 @@ class _AnimatedSlideTextState extends State<AnimatedSlideText> with SingleTicker
 
     // Optional slide animation: starts slightly off center (coming out of the body)
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.0, 0.5), // Start slightly below
-      end: Offset.zero,              // End in the center
+      begin: const Offset(0.0, 0.5),
+      end: Offset.zero,
     ).animate(
       CurvedAnimation(
         parent: _controller,
@@ -81,7 +81,7 @@ class _AnimatedSlideTextState extends State<AnimatedSlideText> with SingleTicker
         return SlideTransition(
           position: _slideAnimation,
           child: ScaleTransition(
-            scale: _scaleAnimation, // Apply the scale animation
+            scale: _scaleAnimation,
             child: Text(
               widget.text,
               textAlign: widget.textAlign,
@@ -115,7 +115,7 @@ class StaggeredTextReveal extends StatefulWidget {
     required this.text,
     this.fontSize = 20.0,
     this.color,
-    this.duration = const Duration(milliseconds: 2000), // Total animation duration
+    this.duration = const Duration(milliseconds: 2000),
   }) : super(key: key);
 
   @override
@@ -160,7 +160,7 @@ class _StaggeredTextRevealState extends State<StaggeredTextReveal> with SingleTi
           child: Stack(
             children: [
               Transform.translate(
-                offset: Offset(0, 30 * (1.0 - _revealAnimation.value)), // Slide from bottom up
+                offset: Offset(0, 30 * (1.0 - _revealAnimation.value)),
                 child: Opacity(
                   opacity: _revealAnimation.value,
                   child: Text(

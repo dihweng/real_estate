@@ -183,11 +183,11 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
           children: [
             // Flutter map with controller and markers
             FlutterMap(
-              mapController: _mapController, // Added MapController
+              mapController: _mapController,
               options: MapOptions(
                   initialCenter: _initialPosition,
                   initialZoom: 12.0,
-                  crs: const Epsg3857() // Common CRS for OpenStreetMap tiles
+                  crs: const Epsg3857()
               ),
               children: [
                 TileLayer(
@@ -289,7 +289,7 @@ class _MapSearchState extends State<MapSearch> with TickerProviderStateMixin {
                       addVerticalSpace(4),
                       FloatingActionButton(
                         onPressed: () {
-                          _getCurrentLocation(); // Center on current location
+                          _getCurrentLocation();
                         },
                         backgroundColor: Colors.black.withOpacity(0.2),
                         elevation: 0,

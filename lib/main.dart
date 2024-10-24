@@ -88,7 +88,7 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Quiver',
+      title: 'Real Estate',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.themeMode,

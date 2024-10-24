@@ -24,67 +24,6 @@ Widget addHorizontalSpace(double width) {
   );
 }
 
-
-
-Widget? getNotificationIcon(String? topic, Map<String?, String> topicToImage) {
-  if (topic == null) {
-    // Use a default image when the topic is null
-    return SizedBox(
-      child: Image.asset(
-        'assets/icons/promo_icon.png',
-        height: 5,
-        width: 5,
-        fit: BoxFit.contain,
-      ),
-    );
-  } else {
-    String? imageAsset = topicToImage[topic.toUpperCase()];
-
-    if (imageAsset == null) {
-      // Add a new mapping with the default image asset path for the new topic
-      topicToImage[topic.toUpperCase()] =
-          "assets/images/default_${topic.toLowerCase()}.png";
-
-      // Use the new mapping with the default image asset path
-      imageAsset = topicToImage[topic.toUpperCase()]!;
-    }
-
-    return SizedBox(
-      child: Image.asset(
-        imageAsset,
-        height: 5,
-        width: 5,
-        fit: BoxFit.contain,
-      ),
-    );
-  }
-}
-
-Widget bankCardImage(String type) {
-  String assetPath;
-  switch (type) {
-    case 'visa':
-      assetPath = 'assets/images/visa.png';
-      break;
-    case 'mastercard':
-      assetPath = 'assets/icons/mastercard-icon.svg';
-      break;
-    case 'verve':
-      assetPath = 'assets/images/verve.png';
-      break;
-    default:
-      assetPath = 'assets/icons/mastercard-icon.svg';
-  }
-
-  return SizedBox(
-    width: 24,
-    height: 24,
-    child: assetPath.endsWith('.svg')
-        ? SvgPicture.asset(assetPath)
-        : Image.asset(assetPath),
-  );
-}
-
 BoxShadow generateBoxShadow(BuildContext context) {
   final isDarkMode = Provider.of<AppTheme>(context).themeMode == ThemeMode.dark;
   final isLightMode = Provider.of<AppTheme>(context).themeMode == ThemeMode.dark;

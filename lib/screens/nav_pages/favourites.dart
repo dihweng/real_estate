@@ -2,14 +2,11 @@ import 'dart:async';
 
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 
 import '../../locator.dart';
 import '../../services/error_state.dart';
 import '../../utils/colors.dart';
 import '../../utils/local_store.dart';
-import '../../viewmodels/home_page_model.dart';
 
 class Favourites extends StatefulWidget {
   const Favourites({super.key});
@@ -19,7 +16,6 @@ class Favourites extends StatefulWidget {
 }
 
 class _FavouritesState extends State<Favourites> with TickerProviderStateMixin{
-  // final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
 
   final _formkey = GlobalKey<FormState>();
   final ErrorState _errorStateCtrl = locator<ErrorState>();
